@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { Appointment } from "../src/Appointment";
+import { Appointment, AppointmentsDayView } from "../src/Appointment";
 import { act } from "react-dom/test-utils";
 
 let container;
@@ -39,3 +39,37 @@ React provides a helper function for our tests that pauses until
 asynchronous rendering has completed. It’s called act and you simply 
 need to wrap it around any React API calls. 
  */
+
+describe("AppointmentsDayView", () => {
+  let container;
+  beforeEach(() => {
+    container = document.createElement("div");
+    document.body.replaceChildren(container);
+  });
+
+  const render = (component) =>
+    act(() => ReactDOM.createRoot(container).render(component));
+
+  it("renders a div with the right id", () => {
+    render(<AppointmentsDayView appointments={[]} />);
+    expect(document.querySelector("div#appointmentsDayView")).not.toBeNull();
+  });
+  it("renders an ol element to display appointments", () => {
+    render(<AppointmentsDayView appointments={[]} />);
+    const listElement = document.querySelector("ol");
+    expect(listElement).not.toBeNull();
+  });
+  it("renders an li for each appointment", () => {
+    const today = new Date();
+    // when I deal with I always have to base all events on the same
+    // moment in time, rather than asking the system for
+    // the current time more than once.
+    const twoAppointments = [
+      { statsAt: today.setHours(12, 0) },
+      { statsAt: today.setHours(13, 0) },
+    ];
+    render(<AppointmentsDayView appointments={twoAppointments} />);
+    const listChildren = document.querySelectorAll("ol > li");
+    expect(listChildren).toHaveLength(2);
+  });
+});
